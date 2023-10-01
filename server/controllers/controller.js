@@ -5,6 +5,7 @@
 
 const connect = async (req, res) => {
     try {
+        res.status(200).json("ping");
     } catch (e) {
         res.status(400).json(e);
     }

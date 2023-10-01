@@ -1,18 +1,16 @@
+import { useEffect, useState } from "react";
 import "./App.css";
 import customFetch from "./handlers/customFetch";
-import io from "socket.io-client";
-
-const socket = io("http://localhost:3000/");
-socket.on("connect", () => {
-    console.log("123");
-});
+import { socket } from "./socket";
+import JoinRoom from "./components/JoinRoom";
 
 export default function App() {
-    const connect = async () => {
-        socket.emit("message", (data: any) => {
-            console.log(data);
-        });
-    };
+    const [isConnected, setIsConnected] = useState(socket.connected);
+
+    useEffect(() => {
+        console.log(isConnected);
+    }, [isConnected]);
+
     const test = async (e: any) => {
         customFetch("play/connect", "POST", { password: "password" }, "").then(
             (res) => {
@@ -23,8 +21,8 @@ export default function App() {
 
     return (
         <div className="App">
+            <JoinRoom />
             <div className="field">
-                <button onClick={() => connect()}>connect</button>
                 <div className="mainSquare">
                     <div className="cell-row">
                         <div
