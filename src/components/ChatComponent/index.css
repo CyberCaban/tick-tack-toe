@@ -1,0 +1,16 @@
+.chatComponent {
+    display: flex;
+    flex-direction: column;
+}
+
+.messages {
+    display: flex;
+    flex-direction: column;
+    overflow: scroll;
+    overflow-x: hidden;
+    padding-left: 20px;
+}
+
+.messages span {
+    color: white;
+}

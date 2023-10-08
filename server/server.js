@@ -10,10 +10,10 @@ const http = require("http");
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server, {
-	cors: {
-		origin: "http://localhost:3000",
-		methods: ["GET", "POST"],
-	},
+    cors: {
+        origin: "http://localhost:3000",
+        methods: ["GET", "POST"],
+    },
 });
 io.listen(4000);
 
@@ -35,48 +35,54 @@ app.use("/play", play);
 let allUsers = [];
 
 const start = () => {
-	try {
-		io.on("connection", (socket) => {
-			console.log("user:", socket.id, "connected");
+    try {
+        io.on("connection", (socket) => {
+            console.log("user:", socket.id, "connected");
 
-			socket.on("joinRoom", (data) => {
-				const { username, room } = data;
-				socket.join(room);
-				console.log(data);
+            socket.on("joinRoom", (data) => {
+                const { username, room } = data;
+                socket.join(room);
+                console.log(data);
 
-				allUsers.push({ id: socket.id, username, room });
+                allUsers.push({ id: socket.id, username, room });
 
-				const timeStamp = Date.now();
+                //devInfo
+                socket.emit("devInfo", {
+                    allUsers,
+                });
+                console.log(allUsers);
 
-				//сообщение всем участникам комнаты, что юзер присоеденился
-				socket.to(room).emit("messageReceive", {
-					message: `${username} has joined`,
-					username: "server",
-					timeStamp,
-				});
+                const timestamp = Date.now();
 
-				//приветствие
-				socket.emit("messageReceive", {
-					message: `Welcome ${username}`,
-					username: "server",
-					timeStamp,
-				});
-			});
+                //сообщение всем участникам комнаты, что юзер присоеденился
+                socket.to(room).emit("messageReceive", {
+                    message: `${username} has joined`,
+                    username: "server",
+                    timestamp,
+                });
 
-			socket.on("disconnect", () => {
-				console.log("user:", socket.id, "disconnected");
-			});
-		});
+                //приветствие
+                socket.emit("messageReceive", {
+                    message: `Welcome ${username}`,
+                    username: "server",
+                    timestamp,
+                });
+            });
 
-		app.get("*", (req, res) => {
-			res.sendFile(path.resolve(__dirname, "../dist/index.html"));
-		});
-		app.listen(PORT, () => {
-			console.log(`started server at ${PORT}`);
-		});
-	} catch (e) {
-		console.log(e);
-	}
+            socket.on("disconnect", () => {
+                console.log("user:", socket.id, "disconnected");
+            });
+        });
+
+        app.get("*", (req, res) => {
+            res.sendFile(path.resolve(__dirname, "../dist/index.html"));
+        });
+        app.listen(PORT, () => {
+            console.log(`started server at ${PORT}`);
+        });
+    } catch (e) {
+        console.log(e);
+    }
 };
 
 start();

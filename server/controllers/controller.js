@@ -12,6 +12,19 @@ const connect = async (req, res) => {
 };
 
 /**
+ * @route POST play/test
+ * @desc test info
+ */
+
+const test = async (req, res) => {
+    try {
+        res.status(200).json(req.body);
+    } catch (e) {
+        res.status(400).json(e);
+    }
+};
+
+/**
  * @route POST play/turn
  * @desc test
  */
@@ -27,4 +40,5 @@ const turn = async (req, res) => {
 module.exports = {
     turn,
     connect,
+    test,
 };
