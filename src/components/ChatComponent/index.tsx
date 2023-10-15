@@ -1,77 +1,91 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { socket } from "../../socket";
 import "./index.css";
+import { useSelector } from "react-redux";
 
 type IMessage = {
-    message: string;
-    username: string;
-    timestamp: number;
+	message: string;
+	username: string;
+	timestamp: number;
 };
 
 export default function Chat() {
-    const [messageReceived, setMessagesReceived] = useState<IMessage[]>([
-        {
-            message: "Welcome banana",
-            username: "server",
-            timestamp: 1696784420752,
-        },
-    ]);
+	const info = useSelector((state: any) => state.info.info);
 
-    useEffect(() => {
-        socket.on("messageReceive", (data: IMessage) => {
-            console.log(data);
-            setMessagesReceived((state) => [
-                ...state,
-                {
-                    message: data.message,
-                    username: data.username,
-                    timestamp: data.timestamp,
-                },
-            ]);
-        });
+	const username = info.username;
+	const room = info.roomID;
 
-        return () => {
-            socket.off("messageReceive");
-        };
-    }, [socket]);
+	const [messageReceived, setMessagesReceived] = useState<IMessage[]>([]);
+	const [message, setMessage] = useState("");
 
-    function sendMessage(e: any) {
-        e.preventDefault();
-        // socket.
-    }
+	const messageDivRef = useRef(null);
 
-    function TimeStampConvert(timestamp: number) {
-        const data = new Date(timestamp);
-        return data.toLocaleString();
-    }
+	useEffect(() => {
+		socket.on("messageReceive", (data: IMessage) => {
+			console.log(data);
+			setMessagesReceived((state) => [
+				...state,
+				{
+					message: data.message,
+					username: data.username,
+					timestamp: data.timestamp,
+				},
+			]);
+		});
 
-    return (
-        <div className="chatComponent">
-            <div className="messages">
-                {messageReceived.map((msg) => {
-                    return (
-                        <span>
-                            <span>{TimeStampConvert(msg.timestamp)}</span>
-                            <p>
-                                {msg.username}: {msg.message}
-                            </p>
-                        </span>
-                    );
-                })}
-            </div>
-            <form
-                action=""
-                className="messagesInput"
-                onSubmit={(e) => sendMessage(e)}
-            >
-                <input
-                    type="text"
-                    name="message"
-                    id="message"
-                    placeholder="Сообщение"
-                />
-                <button type="submit">Отправить</button>
-            </form>
-        </div>
-    );
+		return () => {
+			socket.off("messageReceive");
+		};
+	}, [socket]);
+
+	useEffect(() => {
+		messageDivRef.current.scrollTop = messageDivRef.current.scrollHeight;
+	}, [messageReceived]);
+
+	function sendMessage(e: any) {
+		e.preventDefault();
+		if (message !== "" && username !== "" && room !== "") {
+			const timestamp = Date.now();
+
+			socket.emit("sendMessage", { username, room, message, timestamp });
+			setMessage("");
+		}
+	}
+
+	function TimeStampConvert(timestamp: number) {
+		const data = new Date(timestamp);
+		return data.toLocaleString();
+	}
+
+	return (
+		<div className="chatComponent">
+			<div className="messages" ref={messageDivRef}>
+				{messageReceived.map((msg) => {
+					return (
+						<span>
+							<span>{TimeStampConvert(msg.timestamp)}</span>
+							<p>
+								{msg.username}: {msg.message}
+							</p>
+						</span>
+					);
+				})}
+			</div>
+			<form
+				action=""
+				className="messagesInput"
+				onSubmit={(e) => sendMessage(e)}
+			>
+				<input
+					type="text"
+					name="message"
+					id="message"
+					placeholder="Message"
+					onChange={(e) => setMessage(e.target.value)}
+					value={message}
+				/>
+				<button type="submit">Send</button>
+			</form>
+		</div>
+	);
 }
