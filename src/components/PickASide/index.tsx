@@ -1,24 +1,19 @@
-import React, { useEffect } from "react";
-import { socket } from "../../socket";
+import { useEffect } from "react";
 import { useAtom } from "jotai";
+import { socket } from "../../socket";
 import { atomID, atomSD, atomUN } from "../../jotai";
 
 export default function PickASide() {
-    const [atomUsername, setAtomUsername] = useAtom(atomUN);
-    const [atomRoomID, setAtomRoomID] = useAtom(atomID);
     const [atomSide, setAtomSide] = useAtom(atomSD);
 
     useEffect(() => {}, [socket]);
 
     function pick(e: any) {
         const side = e.target.value;
-        if (atomUsername !== "" && atomRoomID !== "") {
-            socket.emit("pickASide", {
-                side: side,
-            });
-            setAtomSide(side);
-        }
-        console.log(side);
+        socket.emit("pickASide", {
+            side: side,
+        });
+        setAtomSide(side);
     }
 
     return (

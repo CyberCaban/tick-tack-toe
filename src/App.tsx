@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { socket } from "./socket";
 import { useAtom } from "jotai";
-import { atomSD } from "./jotai";
-import customFetch from "./handlers/customFetch";
+import { socket } from "./socket";
+import { atomShowPickASide } from "./jotai";
 import JoinRoom from "./components/JoinRoom";
 import Chat from "./components/ChatComponent";
 import PickASide from "./components/PickASide";
@@ -10,7 +9,7 @@ import "./App.css";
 
 export default function App() {
     const [isConnected, setIsConnected] = useState(socket.connected);
-    const [atomSide, setAtomSide] = useAtom(atomSD);
+    const [showPickASide, setShowPickASide] = useState(atomShowPickASide);
 
     useEffect(() => {
         console.log("User is connected:", isConnected);
@@ -20,6 +19,8 @@ export default function App() {
         socket.on("devInfo", (data) => {
             console.log(data);
         });
+
+        socket.on("showPickASideComponent", () => setShowPickASide(true));
 
         return () => {
             socket.off("devInfo");
@@ -39,7 +40,7 @@ export default function App() {
         <div className="App">
             <JoinRoom />
             <Chat />
-            {atomSide == "" ? <PickASide /> : null}
+            {showPickASide ? <PickASide /> : null}
             <div className="field">
                 <div className="mainSquare">
                     <div className="cell-row">

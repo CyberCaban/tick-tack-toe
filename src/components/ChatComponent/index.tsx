@@ -21,7 +21,6 @@ export default function Chat() {
 
     useEffect(() => {
         socket.on("messageReceive", (data: IMessage) => {
-            console.log(data);
             setMessagesReceived((state) => [
                 ...state,
                 {

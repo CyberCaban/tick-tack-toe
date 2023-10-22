@@ -42,7 +42,11 @@ const start = () => {
             socket.on("joinRoom", (data) => {
                 const { username, room } = data;
 
-                if (allUsers.filter((user) => user.room == room).length < 2) {
+                const usersInRoom = allUsers.filter(
+                    (user) => user.room == room
+                );
+
+                if (usersInRoom.length < 2) {
                     //add a button to pick x or o
 
                     socket.join(room);
@@ -63,43 +67,47 @@ const start = () => {
                         username: "server",
                         timestamp,
                     });
-
-                    socket.on("pickASide", (data) => {
-                        const user = allUsers.find(
-                            (item) => item.id == socket.id
-                        );
-                        user.side = data.side;
-                        console.log(user);
-                    });
-
-                    socket.on("sendMessage", (data) => {
-                        const { username, room, message, timestamp } = data;
-
-                        io.in(room).emit("messageReceive", {
-                            message,
-                            username,
-                            timestamp,
-                        });
-                    });
                 } else {
                     socket.emit("Error", { message: "can't join the room" });
-
-                    socket.on("sendMessage", (data) => {
-                        const { username, room, message, timestamp } = data;
-
-                        io.in(room).emit("messageReceive", {
-                            message,
-                            username,
-                            timestamp,
-                        });
-                    });
                 }
+
+                if (allUsers.filter((user) => user.room == room).length == 2) {
+                    socket.emit("showPickASideComponent");
+                }
+
+                socket.on("pickASide", (data) => {
+                    const user1 = allUsers.find((user) => user.id == socket.id);
+
+                    const user2 = allUsers.find((user) => user.id != socket.id);
+
+                    user1.side = data.side;
+
+                    switch (data.side) {
+                        case "X":
+                            user2.side = "O";
+                            break;
+                        case "O":
+                            user2.side = "X";
+                            break;
+                    }
+
+                    socket.emit("devInfo", allUsers);
+                });
+
+                socket.on("sendMessage", (data) => {
+                    const { username, room, message, timestamp } = data;
+
+                    io.in(room).emit("messageReceive", {
+                        message,
+                        username,
+                        timestamp,
+                    });
+                    socket.emit("devInfo", allUsers);
+                });
 
                 //devInfo
                 socket.on("devInfo", () => {
-                    socket.emit("devInfo", {
-                        allUsers,
-                    });
+                    socket.emit("devInfo", allUsers);
                     console.log(allUsers);
                 });
             });
