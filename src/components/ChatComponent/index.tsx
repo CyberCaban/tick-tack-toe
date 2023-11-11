@@ -18,6 +18,7 @@ export default function Chat() {
   const [message, setMessage] = useState("");
 
   const messageDivRef = useRef(null);
+  const inputMessageDivRef = useRef(null);
 
   useEffect(() => {
     socket.on("messageReceive", (data: IMessage) => {
@@ -53,6 +54,8 @@ export default function Chat() {
         timestamp,
       });
       setMessage("");
+      // @ts-ignore
+      inputMessageDivRef.current.focus()
     }
   }
 
@@ -87,6 +90,7 @@ export default function Chat() {
           placeholder="Message"
           onChange={(e) => setMessage(e.target.value)}
           value={message}
+          ref={inputMessageDivRef}
         />
         <button type="submit">Send</button>
       </form>

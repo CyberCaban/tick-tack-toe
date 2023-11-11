@@ -1,14 +1,17 @@
+import { Request, Response } from "express";
+import { Socket } from "socket.io";
+
 require("dotenv").config();
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
-const app = express();
 const path = require("path");
-const PORT = process.env.PORT || 3000;
 
-const http = require("http");
-const server = http.createServer(app);
+const PORT = process.env.PORT || 3000;
+const app = express();
+const { createServer } = require("http");
 const { Server } = require("socket.io");
+const server = createServer(app);
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:3000",
@@ -17,18 +20,40 @@ const io = new Server(server, {
 });
 io.listen(4000);
 
-const play = require("./routes/router");
-// const auth = require("./routes/authRouter");
-
 app.use(express.static(path.resolve("./dist")));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors());
 
-app.use("/play", play);
+type ESide = "X" | "O" | null;
 
-function socketConnect(socket) {
+interface IUser {
+  id: string;
+  username: string;
+  room: string;
+  side?: ESide;
+}
+
+interface IRoom {
+  room: string;
+  sideX: string;
+  sideO: string;
+  currTurn: string;
+  field: {
+    "cell-00": null | ESide;
+    "cell-01": null | ESide;
+    "cell-02": null | ESide;
+    "cell-10": null | ESide;
+    "cell-11": null | ESide;
+    "cell-12": null | ESide;
+    "cell-20": null | ESide;
+    "cell-21": null | ESide;
+    "cell-22": null | ESide;
+  };
+}
+
+function socketConnect(socket: Socket) {
   socket.on("joinRoom", (data) => {
     JoinRoom(socket, data);
   });
@@ -38,7 +63,7 @@ function socketConnect(socket) {
   });
 }
 
-function JoinRoom(socket, data) {
+function JoinRoom(socket: Socket, data: { username: string; room: string }) {
   const { username, room } = data;
 
   const usersInRoom = allUsers.filter((user) => user.room === room);
@@ -95,7 +120,7 @@ function JoinRoom(socket, data) {
   });
 }
 
-function PickASide(socket, data, room) {
+function PickASide(socket: Socket, data: { side: ESide }, room: string) {
   const user1 = allUsers.filter(
     (user) => user.room === room && user.id === socket.id
   )[0];
@@ -140,35 +165,49 @@ function PickASide(socket, data, room) {
     });
   }
 
+  // @ts-ignore
   const turnPass = rooms.find((room) => room.room === user1.room).currTurn;
   io.to(turnPass).emit("yourTurn");
 }
 
-function Turn(socket, data) {
+function Turn(
+  socket: Socket,
+  data: { row: "0" | "1" | "2"; cell: "0" | "1" | "2" }
+) {
   const { row, cell } = data;
   //находим ид нажатой клетки
   const clickedCellId = "cell-" + row + cell;
   //находим комнату
   const room = rooms.find((room) => room.currTurn === socket.id);
-  console.log(rooms.currTurn);
-  console.log(socket.id);
-  console.log(room);
 
   if (room) {
     //определяем текущего ходящего
     const currTurn = room.currTurn === room.sideX ? room.sideX : room.sideO;
+
     //определяем следующего ходящего
     const nextTurn = room.currTurn === room.sideX ? room.sideO : room.sideX;
+
     //определяем сторону ходящего
     const side = room.sideX === socket.id ? "X" : "O";
+
     //записываем ход на сервере
+    // @ts-ignore
     if (room.field[clickedCellId] === null) {
+      // @ts-ignore
       room.field[clickedCellId] = side;
-      room.currTurn = nextTurn;
 
-      io.to(currTurn).emit("yourTurn", { turn: "Opponent turn" });
-      io.to(nextTurn).emit("yourTurn", { turn: "Your turn" });
+      const winner = winningConditions(room.field);
+      if (winner) {
+        const W = winner === "X" ? room.sideX : room.sideO;
+        const L = winner === "X" ? room.sideO : room.sideX;
+        io.to(W).emit("YouWon");
+        io.to(L).emit("YouLose");
+      } else {
+        room.currTurn = nextTurn;
 
+        io.to(currTurn).emit("yourTurn", { turn: "Opponent turn" });
+        io.to(nextTurn).emit("yourTurn", { turn: "Your turn" });
+      }
       io.to([room.sideX, room.sideO]).emit("fieldUpdate", room.field);
     }
   } else {
@@ -176,7 +215,34 @@ function Turn(socket, data) {
   }
 }
 
-function SendMessage(socket, data) {
+function winningConditions(data: IRoom["field"]) {
+  const winCombs = [
+    ["cell-00", "cell-01", "cell-02"],
+    ["cell-10", "cell-11", "cell-12"],
+    ["cell-20", "cell-21", "cell-22"],
+    ["cell-00", "cell-10", "cell-20"],
+    ["cell-01", "cell-11", "cell-21"],
+    ["cell-02", "cell-12", "cell-22"],
+    ["cell-00", "cell-11", "cell-22"],
+    ["cell-02", "cell-11", "cell-20"],
+  ];
+  const field = data;
+
+  for (const comb of winCombs) {
+    const [a, b, c] = comb;
+    // @ts-ignore
+    if (field[a] && field[a] === field[b] && field[a] === field[c]) {
+      // @ts-ignore
+      return field[a];
+    }
+  }
+  return null;
+}
+
+function SendMessage(
+  socket: Socket,
+  data: { username: string; room: string; message: string; timestamp: string }
+) {
   const { username, room, message, timestamp } = data;
 
   io.in(room).emit("messageReceive", {
@@ -186,36 +252,30 @@ function SendMessage(socket, data) {
   });
 }
 
-function socketDisconnect(socket) {
+function socketDisconnect(socket: Socket) {
   console.log("user:", socket.id, "disconnected");
   allUsers = allUsers.filter((user) => socket.id !== user.id);
   rooms = rooms.filter(
     (item) => item.sideX !== socket.id && item.sideO !== socket.id
   );
-  console.log(rooms);
 }
 
 /**
  * @desc массив, который хранит всех пользователей.
- * Внутри находятся объекты типа {id: socket.id, username, room, side: "X" || "O"}
  */
-let allUsers = [];
-/*
+let allUsers: IUser[] = [];
+/**
  * @desc массив для хранения информации с комнат
- * Внутри находятся объекты типа {room: string, sideX, sideO, currTurn, field:
- * {'cell-00':null,'cell-01':null,'cell-02':null,
- * 'cell-10':null, 'cell-11':null, 'cell-12':null,
- * 'cell-20':null, 'cell-21':null, 'cell-22':null}}
  */
-let rooms = [];
+let rooms: IRoom[] = [];
 
 const start = () => {
   try {
-    io.on("connection", (socket) => {
+    io.on("connection", (socket: Socket) => {
       socketConnect(socket);
     });
 
-    app.get("*", (req, res) => {
+    app.get("*", function (req: Request, res: Response) {
       res.sendFile(path.resolve(__dirname, "../dist/index.html"));
     });
     app.listen(PORT, () => {
