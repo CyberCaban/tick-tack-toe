@@ -14,7 +14,7 @@ const { Server } = require("socket.io");
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: process.env.VERCEL_URL + ":" + PORT,
+    origin: process.env.VERCEL_URL || "http://localhost:3000",
     methods: ["GET", "POST"],
   },
 });
