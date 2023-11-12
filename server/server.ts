@@ -14,7 +14,7 @@ const { Server } = require("socket.io");
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: process.env.VERCEL_URL + ":" + PORT,
     methods: ["GET", "POST"],
   },
 });
@@ -195,6 +195,7 @@ function Turn(
     if (room.field[clickedCellId] === null) {
       // @ts-ignore
       room.field[clickedCellId] = side;
+      io.to([room.sideX, room.sideO]).emit("fieldUpdate", room.field);
 
       const winner = winningConditions(room.field);
       if (winner) {
@@ -208,7 +209,6 @@ function Turn(
         io.to(currTurn).emit("yourTurn", { turn: "Opponent turn" });
         io.to(nextTurn).emit("yourTurn", { turn: "Your turn" });
       }
-      io.to([room.sideX, room.sideO]).emit("fieldUpdate", room.field);
     }
   } else {
     console.log("opponent turn");
