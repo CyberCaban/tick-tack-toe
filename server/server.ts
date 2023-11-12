@@ -54,7 +54,7 @@ interface IRoom {
 }
 
 function socketConnect(socket: Socket) {
-  console.log(socket.id, "connected");
+  console.log(socket);
 
   socket.on("joinRoom", (data) => {
     JoinRoom(socket, data);
