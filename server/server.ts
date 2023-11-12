@@ -14,7 +14,7 @@ const { Server } = require("socket.io");
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: process.env.VERCEL_URL || "http://localhost:3000",
+    origin: "*",
     methods: ["GET", "POST"],
   },
 });
@@ -54,6 +54,8 @@ interface IRoom {
 }
 
 function socketConnect(socket: Socket) {
+  console.log(socket.id, "connected");
+
   socket.on("joinRoom", (data) => {
     JoinRoom(socket, data);
   });
