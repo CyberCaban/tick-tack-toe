@@ -54,12 +54,6 @@ interface IRoom {
 }
 
 function socketConnect(socket: Socket) {
-  //devInfo
-  socket.on("devInfo", () => {
-    socket.emit("devInfo", socket);
-    // console.log(allUsers);
-  });
-
   socket.on("joinRoom", (data) => {
     JoinRoom(socket, data);
   });
@@ -278,6 +272,11 @@ let rooms: IRoom[] = [];
 const start = () => {
   try {
     io.on("connection", (socket: Socket) => {
+      //devInfo
+      socket.on("devInfo", () => {
+        io.emit("devInfo", socket);
+        // console.log(allUsers);
+      });
       socketConnect(socket);
     });
 
