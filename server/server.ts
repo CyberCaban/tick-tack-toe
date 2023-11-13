@@ -54,7 +54,11 @@ interface IRoom {
 }
 
 function socketConnect(socket: Socket) {
-  console.log(socket);
+  //devInfo
+  socket.on("devInfo", () => {
+    socket.emit("devInfo", socket);
+    // console.log(allUsers);
+  });
 
   socket.on("joinRoom", (data) => {
     JoinRoom(socket, data);
