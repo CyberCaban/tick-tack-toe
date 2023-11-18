@@ -21,7 +21,7 @@ const expressServer = app.listen(PORT, () => {
 
 const io = new Server(expressServer, {
   cors: {
-    origin: false,
+    origin: "https://tick-tack-toe-lyart.vercel.app/",
     // process.env.NODE_ENV === "production"
     //   ? false
     //   : ["http://localhost:3000", "http://127.0.0.1:3000"],
