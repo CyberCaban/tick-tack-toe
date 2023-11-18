@@ -274,9 +274,10 @@ function socketDisconnect(socket: Socket) {
 
 const start = () => {
   try {
+    io.emit("devInfo", { dasda: "sadasdas" });
     io.on("connection", (socket: Socket) => {
       console.log(socket.id);
-      socket.emit("devInfo", socket);
+
       //devInfo
       socket.on("devInfo", () => {
         // console.log(allUsers);
