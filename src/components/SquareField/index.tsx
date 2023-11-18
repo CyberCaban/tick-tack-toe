@@ -48,6 +48,14 @@ export default function SquareField(): JSX.Element {
       console.log(data);
       setField(data);
     });
+
+    socket.on("YouWon", () => {
+      setTurn("You've won!!!");
+    });
+
+    socket.on("YouLose", () => {
+      setTurn("You've lost((");
+    });
   }, [socket]);
 
   function makeTurn(e: React.MouseEvent<HTMLDivElement>) {
@@ -58,7 +66,7 @@ export default function SquareField(): JSX.Element {
 
   return (
     <div className="field">
-      <h2 onClick={() => handleTurn()}>{turn}</h2>
+      <h2>{turn}</h2>
       <div className="mainSquare">
         {size.map((row) => (
           <div className="cell-row">

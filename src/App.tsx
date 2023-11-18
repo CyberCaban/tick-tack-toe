@@ -29,14 +29,6 @@ export default function App() {
       setAtomSide(data.side);
     });
 
-    socket.on("YouWon", () => {
-      alert("You've won!!!");
-    });
-
-    socket.on("YouLose", () => {
-      alert("You've lost((");
-    });
-
     return () => {
       socket.off("devInfo");
     };

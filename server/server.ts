@@ -1,30 +1,32 @@
 import { Request, Response } from "express";
 import { Socket } from "socket.io";
-
+import express from "express";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import path from "path";
+import { Server } from "socket.io";
 require("dotenv").config();
-const express = require("express");
-const cookieParser = require("cookie-parser");
-const cors = require("cors");
-const path = require("path");
-
 const PORT = process.env.PORT || 3000;
 const app = express();
-const { createServer } = require("http");
-const { Server } = require("socket.io");
-const httpServer = createServer(app);
-const io = new Server(httpServer, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"],
-  },
-});
-io.listen(4000);
 
 app.use(express.static(path.resolve("./dist")));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors());
+
+const expressServer = app.listen(PORT, () => {
+  console.log(`started server at ${PORT}`);
+});
+
+const io = new Server(expressServer, {
+  cors: {
+    origin:
+      process.env.NODE_ENV === "production"
+        ? false
+        : ["http://localhost:3000", "http://127.0.0.1:3000"],
+  },
+});
 
 type ESide = "X" | "O" | null;
 
@@ -52,6 +54,15 @@ interface IRoom {
     "cell-22": null | ESide;
   };
 }
+
+/**
+ * @desc массив, который хранит всех пользователей.
+ */
+let allUsers: IUser[] = [];
+/**
+ * @desc массив для хранения информации с комнат
+ */
+let rooms: IRoom[] = [];
 
 function socketConnect(socket: Socket) {
   socket.on("joinRoom", (data) => {
@@ -167,7 +178,8 @@ function PickASide(socket: Socket, data: { side: ESide }, room: string) {
 
   // @ts-ignore
   const turnPass = rooms.find((room) => room.room === user1.room).currTurn;
-  io.to(turnPass).emit("yourTurn");
+  console.log(turnPass);
+  io.to(turnPass).emit("yourTurn", { turn: "Your turn" });
 }
 
 function Turn(
@@ -260,18 +272,10 @@ function socketDisconnect(socket: Socket) {
   );
 }
 
-/**
- * @desc массив, который хранит всех пользователей.
- */
-let allUsers: IUser[] = [];
-/**
- * @desc массив для хранения информации с комнат
- */
-let rooms: IRoom[] = [];
-
 const start = () => {
   try {
     io.on("connection", (socket: Socket) => {
+      console.log(socket.id);
       //devInfo
       socket.on("devInfo", () => {
         io.emit("devInfo", socket);
@@ -282,9 +286,6 @@ const start = () => {
 
     app.get("*", function (req: Request, res: Response) {
       res.sendFile(path.resolve(__dirname, "../dist/index.html"));
-    });
-    app.listen(PORT, () => {
-      console.log(`started server at ${PORT}`);
     });
   } catch (e) {
     console.log(e);
