@@ -21,10 +21,10 @@ const expressServer = app.listen(PORT, () => {
 
 const io = new Server(expressServer, {
   cors: {
-    origin:
-      process.env.NODE_ENV === "production"
-        ? false
-        : ["http://localhost:3000", "http://127.0.0.1:3000"],
+    origin: "*",
+    // process.env.NODE_ENV === "production"
+    //   ? false
+    //   : ["http://localhost:3000", "http://127.0.0.1:3000"],
   },
 });
 
