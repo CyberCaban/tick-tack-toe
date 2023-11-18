@@ -22,9 +22,6 @@ const expressServer = app.listen(PORT, () => {
 const io = new Server(expressServer, {
   cors: {
     origin: false,
-    // process.env.NODE_ENV === "production"
-    //   ? false
-    //   : ["http://localhost:3000", "http://127.0.0.1:3000"],
   },
 });
 
@@ -274,12 +271,12 @@ function socketDisconnect(socket: Socket) {
 
 const start = () => {
   try {
-    io.emit("devInfo", { dasda: "sadasdas" });
     io.on("connection", (socket: Socket) => {
       console.log(socket.id);
 
       //devInfo
       socket.on("devInfo", () => {
+        io.emit("devInfo", socket.id);
         // console.log(allUsers);
       });
       socketConnect(socket);

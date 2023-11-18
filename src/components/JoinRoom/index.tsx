@@ -35,10 +35,14 @@ function JoinRoom() {
     setAtomRoomID(e.target.roomID.value);
   }
 
+  const test = async (e: any) => {
+    socket.emit("devInfo");
+  };
+
   return (
     <div>
       <form className="joinRoom" onSubmit={(e) => ioJoinRoom(e)}>
-        <h2>Join room!</h2>
+        <h2 onClick={(e) => test(e)}>Join room!</h2>
         <input
           type="text"
           name="username"

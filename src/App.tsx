@@ -34,15 +34,6 @@ export default function App() {
     };
   }, [socket]);
 
-  const test = async (e: any) => {
-    socket.emit("devInfo");
-    // customFetch("play/connect", "POST", { password: "password" }, "").then(
-    //     (res) => {
-    //         console.log(res);
-    //     }
-    // );
-  };
-
   return (
     <div className="App">
       <JoinRoom />

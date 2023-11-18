@@ -1,6 +1,5 @@
 import io from "socket.io-client";
 
-const SERVER_URL = "https://tick-tack-toe-lyart.vercel.app";
-export const socket = io(SERVER_URL, {
+export const socket = io(window.location.host, {
   autoConnect: false,
 });
