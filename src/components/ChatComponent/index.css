@@ -1,18 +1,18 @@
 .chatComponent {
-	display: flex;
-	flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .messages {
-	display: flex;
-	flex-direction: column;
-	overflow: scroll;
-	overflow-x: hidden;
-	padding-left: 20px;
-	max-height: 280px;
-	max-width: 280px;
+  display: flex;
+  flex-direction: column;
+  overflow: scroll;
+  overflow-x: hidden;
+  padding-left: 20px;
+  max-height: 280px;
+  max-width: 280px;
 }
 
 .messages span {
-	color: white;
+  color: white;
 }

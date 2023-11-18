@@ -1,0 +1,58 @@
+.field {
+  width: 30%;
+  aspect-ratio: 1/1;
+  align-self: center;
+  outline: 1px white solid;
+}
+
+.mainSquare {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.cell-row {
+  width: 100%;
+  height: calc(100% / 3);
+  display: flex;
+}
+
+.cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(100% / 3);
+  height: 100%;
+  outline: 1px white solid;
+}
+
+.circle {
+  width: 70%;
+  height: 70%;
+  border-radius: 50%;
+  border: 10px blue solid;
+}
+
+.cross {
+  width: 25px;
+  height: 25px;
+  background-color: red;
+  border: 1px solid black;
+}
+
+.cross:before {
+  height: 25px;
+  width: 2px;
+  margin-left: 12px;
+  background-color: black;
+  transform: rotate(45deg);
+  z-index: 1;
+}
+.cross:after {
+  height: 25px;
+  width: 2px;
+  background-color: black;
+  transform: rotate(90deg);
+  z-index: 2;
+}

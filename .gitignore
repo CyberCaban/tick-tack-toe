@@ -31,3 +31,4 @@ npm-debug.log.*
 release
 dist
 vscode
+.vscode

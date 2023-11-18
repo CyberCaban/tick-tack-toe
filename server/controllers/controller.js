@@ -4,11 +4,11 @@
  */
 
 const connect = async (req, res) => {
-    try {
-        res.status(200).json("ping");
-    } catch (e) {
-        res.status(400).json(e);
-    }
+  try {
+    res.status(200).json("ping");
+  } catch (e) {
+    res.status(400).json(e);
+  }
 };
 
 /**
@@ -17,11 +17,11 @@ const connect = async (req, res) => {
  */
 
 const test = async (req, res) => {
-    try {
-        res.status(200).json(req.body);
-    } catch (e) {
-        res.status(400).json(e);
-    }
+  try {
+    res.status(200).json(req.body);
+  } catch (e) {
+    res.status(400).json(e);
+  }
 };
 
 /**
@@ -30,15 +30,15 @@ const test = async (req, res) => {
  */
 
 const turn = async (req, res) => {
-    try {
-        res.status(200).json(req.body);
-    } catch (e) {
-        res.status(400).json(e);
-    }
+  try {
+    res.status(200).json(req.body);
+  } catch (e) {
+    res.status(400).json(e);
+  }
 };
 
 module.exports = {
-    turn,
-    connect,
-    test,
+  turn,
+  connect,
+  test,
 };
