@@ -276,9 +276,9 @@ const start = () => {
   try {
     io.on("connection", (socket: Socket) => {
       console.log(socket.id);
+      socket.emit("devInfo", socket);
       //devInfo
       socket.on("devInfo", () => {
-        io.emit("devInfo", socket);
         // console.log(allUsers);
       });
       socketConnect(socket);
