@@ -8,7 +8,10 @@
     "prebuild": "npm i",
     "build": "webpack --mode production",
     "prod": "webpack-dev-server --mode production",
-    "server": "nodemon ./server/server.ts"
+    "server": "nodemon ./server/server.ts",
+    "predeploy": "npm i",
+    "deploy": "webpack --mode production",
+    "postdeploy": "npm run server"
   },
   "keywords": [],
   "author": "CyberCaban",

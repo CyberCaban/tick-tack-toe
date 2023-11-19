@@ -40,15 +40,15 @@ interface IRoom {
   sideO: string;
   currTurn: string;
   field: {
-    "cell-00": null | ESide;
-    "cell-01": null | ESide;
-    "cell-02": null | ESide;
-    "cell-10": null | ESide;
-    "cell-11": null | ESide;
-    "cell-12": null | ESide;
-    "cell-20": null | ESide;
-    "cell-21": null | ESide;
-    "cell-22": null | ESide;
+    "cell-00": ESide;
+    "cell-01": ESide;
+    "cell-02": ESide;
+    "cell-10": ESide;
+    "cell-11": ESide;
+    "cell-12": ESide;
+    "cell-20": ESide;
+    "cell-21": ESide;
+    "cell-22": ESide;
   };
 }
 
@@ -175,8 +175,8 @@ function PickASide(socket: Socket, data: { side: ESide }, room: string) {
 
   // @ts-ignore
   const turnPass = rooms.find((room) => room.room === user1.room).currTurn;
-  console.log(turnPass);
   io.to(turnPass).emit("yourTurn", { turn: "Your turn" });
+  io.to(user1.id).emit("yourTurn", { turn: "Opponent turn" });
 }
 
 function Turn(
@@ -208,10 +208,24 @@ function Turn(
 
       const winner = winningConditions(room.field);
       if (winner) {
+        let restartTime = 5000;
         const W = winner === "X" ? room.sideX : room.sideO;
         const L = winner === "X" ? room.sideO : room.sideX;
         io.to(W).emit("YouWon");
         io.to(L).emit("YouLose");
+
+        io.to([room.sideX, room.sideO]).emit("gameRestart");
+
+        setTimeout(() => {
+          for (let cell in room.field) {
+            room.field[cell] = null;
+          }
+          console.log(room);
+
+          io.to([room.sideX, room.sideO]).emit("fieldUpdate", room.field);
+          io.to(currTurn).emit("yourTurn", { turn: "Your turn" });
+          io.to(nextTurn).emit("yourTurn", { turn: "Opponent turn" });
+        }, restartTime);
       } else {
         room.currTurn = nextTurn;
 
@@ -262,7 +276,7 @@ function SendMessage(
 }
 
 function socketDisconnect(socket: Socket) {
-  console.log("user:", socket.id, "disconnected");
+  // console.log("user:", socket.id, "disconnected");
   allUsers = allUsers.filter((user) => socket.id !== user.id);
   rooms = rooms.filter(
     (item) => item.sideX !== socket.id && item.sideO !== socket.id
@@ -272,13 +286,7 @@ function socketDisconnect(socket: Socket) {
 const start = () => {
   try {
     io.on("connection", (socket: Socket) => {
-      console.log(socket.id);
-
-      //devInfo
-      socket.on("devInfo", () => {
-        io.emit("devInfo", socket.id);
-        // console.log(allUsers);
-      });
+      // console.log("user:", socket.id, "connected");
       socketConnect(socket);
     });
 

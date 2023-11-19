@@ -11,6 +11,7 @@ import "./App.css";
 export default function App() {
   const [showPickASide, setShowPickASide] = useAtom(atomShowPickASide);
   const [atomSide, setAtomSide] = useAtom(atomSD);
+  const [titleMessage, setTitleMessage] = useState("");
 
   useEffect(() => {
     // socket.emit("startGame");
@@ -29,6 +30,13 @@ export default function App() {
       setAtomSide(data.side);
     });
 
+    socket.on("gameRestart", () => {
+      setTitleMessage("Game will restart in 5 seconds");
+      setTimeout(() => {
+        setTitleMessage("");
+      }, 5000);
+    });
+
     return () => {
       socket.off("devInfo");
     };
@@ -38,8 +46,15 @@ export default function App() {
     <div className="App">
       <JoinRoom />
       <Chat />
-      {showPickASide ? `Pick a side: ` : `Your side: ${atomSide} `}
-      {showPickASide ? <PickASide /> : null}
+      {showPickASide ? (
+        <>
+          <p>Pick a side: </p>
+          <PickASide />
+        </>
+      ) : (
+        <p>Your side: {atomSide}</p>
+      )}
+      {titleMessage}
       <SquareField />
     </div>
   );
