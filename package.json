@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "webpack-dev-server --mode development",
+    "prebuild": "npm i",
     "build": "webpack --mode production",
     "prod": "webpack-dev-server --mode production",
     "server": "nodemon ./server/server.ts"
