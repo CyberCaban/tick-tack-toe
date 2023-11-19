@@ -1,3 +1,4 @@
 import io from "socket.io-client";
 
-export const socket = io();
+const SERVER_URL = "https://tick-tack-toe.onrender.com/";
+export const socket = io(SERVER_URL, { autoConnect: false });
