@@ -247,9 +247,10 @@ function Turn(
         io.to(nextTurn).emit("yourTurn", { turn: "Your turn" });
       }
     }
-  } else {
-    console.log("opponent turn");
   }
+  //  else {
+  //   console.log("opponent turn");
+  // }
 }
 
 function winningConditions(data: IRoom["field"]) {
