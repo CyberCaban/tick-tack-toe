@@ -56,6 +56,10 @@ export default function SquareField(): JSX.Element {
     socket.on("YouLose", () => {
       setTurn("You've lost((");
     });
+
+    socket.on("Tie", () => {
+      setTurn("Tie");
+    });
   }, [socket]);
 
   function makeTurn(e: React.MouseEvent<HTMLDivElement>) {

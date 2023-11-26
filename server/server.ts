@@ -206,9 +206,9 @@ function Turn(
       room.field[clickedCellId] = side;
       io.to([room.sideX, room.sideO]).emit("fieldUpdate", room.field);
 
+      let restartTime = 5000;
       const winner = winningConditions(room.field);
-      if (winner) {
-        let restartTime = 5000;
+      if (winner == "X" || winner == "O") {
         const W = winner === "X" ? room.sideX : room.sideO;
         const L = winner === "X" ? room.sideO : room.sideX;
         io.to(W).emit("YouWon");
@@ -220,9 +220,23 @@ function Turn(
           for (let cell in room.field) {
             room.field[cell] = null;
           }
-          console.log(room);
 
           io.to([room.sideX, room.sideO]).emit("fieldUpdate", room.field);
+          io.to(currTurn).emit("yourTurn", { turn: "Your turn" });
+          io.to(nextTurn).emit("yourTurn", { turn: "Opponent turn" });
+        }, restartTime);
+      } else if (winner == "tie") {
+        io.to([room.sideX, room.sideO]).emit("Tie");
+
+        io.to([room.sideX, room.sideO]).emit("gameRestart");
+
+        setTimeout(() => {
+          for (let cell in room.field) {
+            room.field[cell] = null;
+          }
+
+          io.to([room.sideX, room.sideO]).emit("fieldUpdate", room.field);
+
           io.to(currTurn).emit("yourTurn", { turn: "Your turn" });
           io.to(nextTurn).emit("yourTurn", { turn: "Opponent turn" });
         }, restartTime);
@@ -259,6 +273,17 @@ function winningConditions(data: IRoom["field"]) {
       return field[a];
     }
   }
+
+  let count = 0;
+  for (const cell in field) {
+    if (!field[cell]) {
+      count++;
+    }
+  }
+  if (!count) {
+    return "tie";
+  }
+
   return null;
 }
 
