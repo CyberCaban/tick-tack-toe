@@ -3,20 +3,14 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { WebpackManifestPlugin } = require("webpack-manifest-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
   module: {
     rules: [
       {
-        test: /\.css$/i,
-        use: [
-          {
-            loader: "style-loader",
-          },
-          {
-            loader: "css-loader",
-          },
-        ],
+        test: /\.(sa|sc|c)ss$/i,
+        use: ["style-loader", "css-loader", "postcss-loader"],
       },
       {
         test: /\.[jt]sx?$/,
@@ -58,7 +52,6 @@ module.exports = {
     clean: true,
   },
   devServer: {
-    historyApiFallback: true,
     static: {
       directory: path.join(__dirname, "/dist"),
     },
@@ -66,6 +59,7 @@ module.exports = {
     hot: true,
     compress: true,
     open: true,
+    historyApiFallback: true,
   },
   devtool: "inline-source-map",
   plugins: [
@@ -76,6 +70,7 @@ module.exports = {
       cache: true,
     }),
     new WebpackManifestPlugin(),
+    new MiniCssExtractPlugin(),
   ],
   optimization: {
     splitChunks: {

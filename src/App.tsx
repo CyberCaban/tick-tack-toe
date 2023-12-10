@@ -43,7 +43,7 @@ export default function App() {
   }, [socket]);
 
   return (
-    <div className="App">
+    <div className="App w-screen h-screen bg-zinc-800">
       <JoinRoom />
       <Chat />
       {showPickASide ? (
