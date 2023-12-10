@@ -6,7 +6,6 @@ import JoinRoom from "./components/JoinRoom";
 import Chat from "./components/ChatComponent";
 import PickASide from "./components/PickASide";
 import SquareField from "./components/SquareField";
-import "./App.css";
 
 export default function App() {
   const [showPickASide, setShowPickASide] = useAtom(atomShowPickASide);
@@ -43,9 +42,12 @@ export default function App() {
   }, [socket]);
 
   return (
-    <div className="App w-screen h-screen bg-zinc-800">
+    <div className="w-screen h-screen bg-zinc-800 flex justify-center items-center flex-col">
+      <div className="flex flex-col justify-center items-center">
+
       <JoinRoom />
       <Chat />
+      </div>
       {showPickASide ? (
         <>
           <p>Pick a side: </p>

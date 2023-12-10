@@ -69,7 +69,7 @@ export default function SquareField(): JSX.Element {
   }
 
   return (
-    <div className="field">
+    <div className="field w-[45%]">
       <h2>{turn}</h2>
       <div className="mainSquare">
         {size.map((row) => (

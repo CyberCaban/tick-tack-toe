@@ -40,17 +40,18 @@ function JoinRoom() {
   };
 
   return (
-    <div>
-      <form className="joinRoom" onSubmit={(e) => ioJoinRoom(e)}>
+    <div className="flex justify-center px-3 py-2 rounded-md bg-zinc-500/50 m-2">
+      <form className="flex flex-col justify-center w-80" onSubmit={(e) => ioJoinRoom(e)}>
         <h2 onClick={(e) => test(e)}>Join room!</h2>
         <input
+          className="text-input"
           type="text"
           name="username"
           placeholder="username"
           id="username"
         />
-        <input type="text" name="roomID" placeholder="roomId" id="roomID" />
-        <button type="submit">Join!!!</button>
+        <input type="text" name="roomID" placeholder="roomId" id="roomID" className="text-input "/>
+        <button type="submit" className="btn-input hover:bg-zinc-500/50 after:shadow-lg before:shadow-none">Join!!!</button>
       </form>
     </div>
   );

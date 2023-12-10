@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { useAtom } from "jotai";
 import { atomID, atomUN } from "../../jotai";
 import { socket } from "../../socket";
-import "./index.css";
 
 type IMessage = {
   message: string;
@@ -14,7 +13,19 @@ export default function Chat() {
   const [atomUsername, setAtomUsername] = useAtom(atomUN);
   const [atomRoomID, setAtomRoomID] = useAtom(atomID);
 
-  const [messageReceived, setMessagesReceived] = useState<IMessage[]>([]);
+  const [messageReceived, setMessagesReceived] = useState<IMessage[]>([ {
+    message: "sadafggbgcdf",
+    username: "amoongus",
+    timestamp: 1687898918753,
+  }, {
+    message: "dssssddf",
+    username: "amoongus",
+    timestamp: 1687898916111,
+  }, {
+    message: "okxvpokpoeskcs a,,zpxkodmvpse[qw[qwkfjdcv",
+    username: "amoongus",
+    timestamp: 1687898911111,
+  }]);
   const [message, setMessage] = useState("");
 
   const messageDivRef = useRef(null);
@@ -65,14 +76,14 @@ export default function Chat() {
   }
 
   return (
-    <div className="chatComponent">
-      <div className="messages" ref={messageDivRef}>
+    <div className="flex flex-col w-80 bg-zinc-500/50 justify-center px-3 py-2 rounded-md">
+      <div className="messages flex flex-col overflow-y-scroll overflow-x-hidden pl-5 max-w-md max-h-48" ref={messageDivRef}>
         {messageReceived.map((msg) => {
           return (
-            <span>
+            <span className="bg-zinc-500 px-0.5 py-0.5 rounded-md m-0.5">
               <span>{TimeStampConvert(msg.timestamp)}</span>
               <p>
-                {msg.username}: {msg.message}
+                <span className="text-neutral-200/50">{msg.username}:</span> <span>{msg.message}</span>
               </p>
             </span>
           );
@@ -91,8 +102,9 @@ export default function Chat() {
           onChange={(e) => setMessage(e.target.value)}
           value={message}
           ref={inputMessageDivRef}
+          className="text-input"
         />
-        <button type="submit">Send</button>
+        <button type="submit" className="btn-input">Send</button>
       </form>
     </div>
   );
